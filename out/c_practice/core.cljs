@@ -12,7 +12,7 @@
 
 (def i (atom 0))
 (def j (atom 2))
-(def text (atom ""))
+(def text (atom 0))
 
 (defn render []
   [:div {:style {:font-size "2em"}}
@@ -26,7 +26,8 @@
                                                        (reset! j 2))}]
     [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
    [:div
-    [:input {:type "text" :value @text :on-change #(reset! text (-> % .-target .-value))}]
+    ;[:input {:type "text" :value @text :on-change #(reset! text (-> % .-target .-value))}]
+    [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
     [:input {:type "button" :value "Go" :on-click #(reset! i (int @text))}]
     ]])
 
