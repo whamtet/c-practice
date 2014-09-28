@@ -13,6 +13,7 @@
 (def i (atom 0))
 (def j (atom 2))
 (def text (atom 0))
+(def proceed-text (atom ""))
 
 (defn render []
   [:div {:style {:font-size "2em"}}
@@ -24,7 +25,14 @@
     [:input {:type "button" :value "Next" :on-click #(do
                                                        (swap! i inc)
                                                        (reset! j 2))}]
-    [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]][:div][:div]
+    [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
+   [:div
+    [:input {:type "text" :value @proceed-text :on-change #(reset! proceed-text (-> % .-target .-value))
+             :on-focus #(reset! proceed-text "")}]
+    [:input {:type "button" :value "Conditional Proceed" :on-click #(when (= @proceed-text (first (nth data @i)))
+                                                                    (swap! i inc)
+                                                                    (reset! j 2))}]]
+   [:br]
    [:div
     [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
     [:input {:type "button" :value "Go" :on-click #(do
@@ -36,3 +44,5 @@
  [render]
  (.getElementById js/document "content"))
 
+(defn t []
+  (println @proceed-text (first (nth data @i))))
