@@ -20,9 +20,11 @@
    [:div @i " " (apply str (interpose " " (take @j (nth data @i))))]
    [:div
     [:input {:type "button" :value "Previous" :on-click #(do
+                                                           (reset! proceed-text "")
                                                            (swap! i dec)
                                                            (reset! j 2))}]
     [:input {:type "button" :value "Next" :on-click #(do
+                                                       (reset! proceed-text "")
                                                        (swap! i inc)
                                                        (reset! j 2))}]
     [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
