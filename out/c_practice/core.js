@@ -53,7 +53,8 @@ return cljs.core.reset_BANG_.call(null,c_practice.core.j,(2));
 })], null)], null)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div","div",1057191632),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"input","input",556931961),new cljs.core.PersistentArrayMap(null, 4, [new cljs.core.Keyword(null,"type","type",1174270348),"text",new cljs.core.Keyword(null,"value","value",305978217),cljs.core.deref.call(null,c_practice.core.proceed_text),new cljs.core.Keyword(null,"on-change","on-change",-732046149),(function (p1__5109_SHARP_){return cljs.core.reset_BANG_.call(null,c_practice.core.proceed_text,p1__5109_SHARP_.target.value);
 }),new cljs.core.Keyword(null,"on-focus","on-focus",-13737624),(function (){return cljs.core.reset_BANG_.call(null,c_practice.core.proceed_text,"");
 })], null)], null),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"input","input",556931961),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"type","type",1174270348),"button",new cljs.core.Keyword(null,"value","value",305978217),"Conditional Proceed",new cljs.core.Keyword(null,"on-click","on-click",1632826543),(function (){if(cljs.core._EQ_.call(null,cljs.core.deref.call(null,c_practice.core.proceed_text),cljs.core.first.call(null,cljs.core.nth.call(null,c_practice.core.data,cljs.core.deref.call(null,c_practice.core.i)))))
-{cljs.core.swap_BANG_.call(null,c_practice.core.i,cljs.core.inc);
+{cljs.core.reset_BANG_.call(null,c_practice.core.proceed_text,"");
+cljs.core.swap_BANG_.call(null,c_practice.core.i,cljs.core.inc);
 return cljs.core.reset_BANG_.call(null,c_practice.core.j,(2));
 } else
 {return null;

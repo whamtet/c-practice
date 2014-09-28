@@ -1,6 +1,6 @@
 (ns c-practice.core
   (:require
-      [reagent.core :as reagent :refer [atom]]))
+   [reagent.core :as reagent :refer [atom]]))
 
 (enable-console-print!)
 
@@ -32,8 +32,9 @@
     [:input {:type "text" :value @proceed-text :on-change #(reset! proceed-text (-> % .-target .-value))
              :on-focus #(reset! proceed-text "")}]
     [:input {:type "button" :value "Conditional Proceed" :on-click #(when (= @proceed-text (first (nth data @i)))
-                                                                    (swap! i inc)
-                                                                    (reset! j 2))}]]
+                                                                      (reset! proceed-text "")
+                                                                      (swap! i inc)
+                                                                      (reset! j 2))}]]
    [:br]
    [:div
     [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
