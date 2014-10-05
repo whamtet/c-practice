@@ -29,9 +29,17 @@
                                                        (reset! j 2))}]
     [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
    [:div
-    [:input {:type "text" :value @proceed-text :on-change #(reset! proceed-text (-> % .-target .-value))
+    [:input {:type "text" :value @proceed-text :on-change #(let [
+                                                                 value (-> % .-target .-value)
+                                                                 ]
+                                                             (if (= value (first (nth data @i)))
+                                                               (do
+                                                                 (reset! proceed-text "")
+                                                                 (swap! i inc)
+                                                                 (reset! j 2))
+                                                               (reset! proceed-text value)))
              :on-focus #(reset! proceed-text "")}]
-    [:input {:type "button" :value "Conditional Proceed" :on-click #(when (= @proceed-text (first (nth data @i)))
+    #_[:input {:type "button" :value "Conditional Proceed" :on-click #(when (= @proceed-text (first (nth data @i)))
                                                                       (reset! proceed-text "")
                                                                       (swap! i inc)
                                                                       (reset! j 2))}]]
