@@ -14,10 +14,19 @@
 (def j (atom 2))
 (def text (atom 0))
 (def proceed-text (atom ""))
+(def show-char? (atom true))
 
 (defn render []
-  [:div {:style {:font-size "2em"}}
-   [:div @i " " (apply str (interpose " " (take @j (nth data @i))))]
+  (println "rendering" show-char?)
+  (let [
+        s (if @show-char?
+            (take @j (nth data @i))
+            (drop 1 (take @j (nth data @i))))
+        ]
+  [:div
+   [:div
+    {:style {:font-size "2em"}}
+    @i " " (apply str (interpose " " s))]
    [:div
     [:input {:type "button" :value "Previous" :on-click #(do
                                                            (reset! proceed-text "")
@@ -38,18 +47,16 @@
                                                                  (swap! i inc)
                                                                  (reset! j 2))
                                                                (reset! proceed-text value)))
-             :on-focus #(reset! proceed-text "")}]
-    #_[:input {:type "button" :value "Conditional Proceed" :on-click #(when (= @proceed-text (first (nth data @i)))
-                                                                      (reset! proceed-text "")
-                                                                      (swap! i inc)
-                                                                      (reset! j 2))}]]
+             :on-focus #(reset! proceed-text "")}][:br]
+    [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"]
+    ]
    [:br]
    [:div
     [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
     [:input {:type "button" :value "Go" :on-click #(do
                                                      (reset! i (int @text))
                                                      (reset! j 2))}]
-    ]])
+    ]]))
 
 (reagent/render-component
  [render]
