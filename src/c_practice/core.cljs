@@ -12,10 +12,18 @@
 
 (def i (atom 0))
 (def j (atom 2))
+(def k (atom 0))
+
 (def text (atom 0))
 (def proceed-text (atom ""))
 (def show-char? (atom true))
 (def auto-proceed? (atom false))
+(def shuffled (shuffle (range 800)))
+
+(defn bounded-dec [x]
+  (if (zero? x) 0 (dec x)))
+(defn bounded-inc [x]
+  (if (= 801 x) x (inc x)))
 
 (def proceed
   #(let [
@@ -24,7 +32,7 @@
      (if (= value (first (nth data @i)))
        (do
          (reset! proceed-text "")
-         (swap! i inc)
+         (swap! i bounded-inc)
          (reset! j 2))
        (reset! proceed-text value))))
 
@@ -41,13 +49,24 @@
      [:div
       [:input {:type "button" :value "Previous" :on-click #(do
                                                              (reset! proceed-text "")
-                                                             (swap! i dec)
+                                                             (swap! i bounded-dec)
                                                              (reset! j 2))}]
       [:input {:type "button" :value "Next" :on-click #(do
                                                          (reset! proceed-text "")
-                                                         (swap! i inc)
+                                                         (swap! i bounded-inc)
                                                          (reset! j 2))}]
-      [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
+      [:input {:type "button" :value "Hint" :on-click #(swap! j bounded-inc)}]]
+     [:div
+      [:input {:type "button" :value "Random Previous" :on-click #(do
+                                                                    (reset! proceed-text "")
+                                                                    (swap! k bounded-dec)
+                                                                    (reset! i (nth shuffled @k))
+                                                                    (reset! j 2))}]
+      [:input {:type "button" :value "Random Next" :on-click #(do
+                                                                (reset! proceed-text "")
+                                                                (swap! k bounded-inc)
+                                                                (reset! i (nth shuffled @k))
+                                                                (reset! j 2))}]]
      [:div
       [:input {:type "text" :value @proceed-text :on-change #(if @auto-proceed?
                                                                (proceed %)
