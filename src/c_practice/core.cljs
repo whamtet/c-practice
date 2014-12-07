@@ -12,24 +12,28 @@
 
 (def i (atom 0))
 (def j (atom 2))
-(def k (atom 0))
+;(def k (atom 0))
 
 (def text (atom 0))
 (def proceed-text (atom ""))
 (def show-char? (atom true))
 (def auto-proceed? (atom false))
-(def shuffled (shuffle (range 800)))
+(def random-mode? (atom false))
+(def shuffler (vec (shuffle (range 802))))
 
 (defn bounded-dec [x]
-  (if (zero? x) 0 (dec x)))
+  (if (zero? x) x (dec x)))
 (defn bounded-inc [x]
   (if (= 801 x) x (inc x)))
+
 
 (def proceed
   #(let [
          value (if % (-> % .-target .-value) @proceed-text)
+         id (if @random-mode?
+              (shuffler @i) @i)
          ]
-     (if (= value (first (nth data @i)))
+     (if (= value (first (nth data id)))
        (do
          (reset! proceed-text "")
          (swap! i bounded-inc)
@@ -38,14 +42,16 @@
 
 (defn render []
   (let [
+        id (if @random-mode?
+            (shuffler @i) @i)
         s (if @show-char?
-            (take @j (nth data @i))
-            (drop 1 (take @j (nth data @i))))
+            (take @j (nth data id))
+            (drop 1 (take @j (nth data id))))
         ]
     [:div
      [:div
       {:style {:font-size "2em"}}
-      @i " " (apply str (interpose " " s))]
+      id " " (apply str (interpose " " s))]
      [:div
       [:input {:type "button" :value "Previous" :on-click #(do
                                                              (reset! proceed-text "")
@@ -55,8 +61,8 @@
                                                          (reset! proceed-text "")
                                                          (swap! i bounded-inc)
                                                          (reset! j 2))}]
-      [:input {:type "button" :value "Hint" :on-click #(swap! j bounded-inc)}]]
-     [:div
+      [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
+     #_[:div
       [:input {:type "button" :value "Random Previous" :on-click #(do
                                                                     (reset! proceed-text "")
                                                                     (swap! k bounded-dec)
@@ -77,7 +83,8 @@
         [:input {:type "button" :value "Go" :on-click #(proceed)}])
       [:br]
       [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
-      [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"]
+      [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
+      [:input {:type "checkbox" :checked @random-mode? :on-change #(reset! random-mode? (-> % .-target .-checked))} "Random Mode"][:br]
       ]
      [:br]
      [:div
@@ -91,5 +98,3 @@
  [render]
  (.getElementById js/document "content"))
 
-(defn t []
-  (println @proceed-text (first (nth data @i))))
