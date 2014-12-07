@@ -84,7 +84,13 @@
       [:br]
       [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
       [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
-      [:input {:type "checkbox" :checked @random-mode? :on-change #(reset! random-mode? (-> % .-target .-checked))} "Random Mode"][:br]
+      [:input {:type "checkbox" :checked @random-mode? :on-change #(let [
+                                                                         checked? (-> % .-target .-checked)
+                                                                         ]
+                                                                     (reset! random-mode? checked?)
+                                                                     (if-not checked?
+                                                                       (swap! i shuffler)))
+                                                                      } "Random Mode"][:br]
       ]
      [:br]
      [:div
