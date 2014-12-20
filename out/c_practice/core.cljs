@@ -74,14 +74,18 @@
                                                                 (reset! i (nth shuffled @k))
                                                                 (reset! j 2))}]]
      [:div
+      [:form
+       {:on-submit (fn [] (proceed) false)}
       [:input {:type "text" :value @proceed-text :on-change #(if @auto-proceed?
                                                                (proceed %)
-                                                               (reset! proceed-text (-> % .-target .-value))
+                                                               (let [
+                                                                     value (-> % .-target .-value)
+                                                                     ]
+                                                                 (reset! proceed-text value))
                                                                )
                :on-focus #(reset! proceed-text "")}]
       (if-not @auto-proceed?
         [:input {:type "button" :value "Go" :on-click #(proceed)}])
-      [:br]
       [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
       [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
       [:input {:type "checkbox" :checked @random-mode? :on-change #(let [
@@ -91,8 +95,7 @@
                                                                      (if-not checked?
                                                                        (swap! i shuffler)))
                                                                       } "Random Mode"][:br]
-      ]
-     [:br]
+      ]]
      [:div
       [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
       [:input {:type "button" :value "Go" :on-click #(do
