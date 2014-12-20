@@ -85,7 +85,7 @@
                                                                )
                :on-focus #(reset! proceed-text "")}]
       (if-not @auto-proceed?
-        [:input {:type "button" :value "Go" :on-click #(proceed)}])
+        [:input {:type "button" :value "Go" :on-click #(proceed)}])[:br]
       [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
       [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
       [:input {:type "checkbox" :checked @random-mode? :on-change #(let [
