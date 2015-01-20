@@ -19,7 +19,10 @@
 (def show-char? (atom true))
 (def auto-proceed? (atom false))
 (def random-mode? (atom false))
-(def shuffler (vec (shuffle (range 802))))
+(def shuffler (let [
+                    x (shuffle (range 802))
+                    ]
+                (zipmap x (drop 1 (cycle x)))))
 
 (defn bounded-dec [x]
   (if (zero? x) x (dec x)))
