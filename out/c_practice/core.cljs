@@ -2,16 +2,14 @@
   (:require
    [reagent.core :as reagent :refer [atom]]
    [alandipert.storage-atom :refer [local-storage]]
-    ))
+   ))
 
 (enable-console-print!)
 
 (def completed (local-storage (atom #{}) :completed))
 
-(defn s-func [] (reset! completed 3))
-(defn t [] (js/alert (pr-str @completed)))
-
 (def p #(-> % pr-str println))
+(defn t [] (p @completed))
 
 (def data
   (for [line (-> "tuttle" js/document.getElementById .-innerHTML .trim (.split "\n"))]
@@ -26,22 +24,34 @@
 (def show-char? (atom true))
 (def auto-proceed? (atom false))
 (def random-mode? (atom false))
-(def shuffler (let [
-                    x (shuffle (range 802))
-                    ]
-                (zipmap x (drop 1 (cycle x)))))
+
+(def naive-shuffler (let [
+                          x (shuffle (range 802))
+                          ]
+                      (zipmap x (drop 1 (cycle x)))))
+
+(defn smart-shuffler [i]
+  (if (= 802 (count @completed))
+    0
+    (loop [j (naive-shuffler i)]
+      (if (@completed j)
+        (recur (naive-shuffler j))
+        j))))
+
+(defn ban-i []
+  (swap! completed conj @i)
+  (swap! i smart-shuffler))
 
 (defn bounded-dec [x]
   (if (zero? x) x (dec x)))
 (defn bounded-inc [x]
   (if (= 801 x) x (inc x)))
 
-
 (def proceed
   #(let [
          value (if % (-> % .-target .-value) @proceed-text)
          id (if @random-mode?
-              (shuffler @i) @i)
+              (smart-shuffler @i) @i)
          ]
      (if (= value (first (nth data id)))
        (do
@@ -53,7 +63,7 @@
 (defn render []
   (let [
         id (if @random-mode?
-            (shuffler @i) @i)
+             (smart-shuffler @i) @i)
         s (if @show-char?
             (take @j (nth data id))
             (drop 1 (take @j (nth data id))))
@@ -73,39 +83,39 @@
                                                          (reset! j 2))}]
       [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
      #_[:div
-      [:input {:type "button" :value "Random Previous" :on-click #(do
-                                                                    (reset! proceed-text "")
-                                                                    (swap! k bounded-dec)
-                                                                    (reset! i (nth shuffled @k))
-                                                                    (reset! j 2))}]
-      [:input {:type "button" :value "Random Next" :on-click #(do
-                                                                (reset! proceed-text "")
-                                                                (swap! k bounded-inc)
-                                                                (reset! i (nth shuffled @k))
-                                                                (reset! j 2))}]]
+        [:input {:type "button" :value "Random Previous" :on-click #(do
+                                                                      (reset! proceed-text "")
+                                                                      (swap! k bounded-dec)
+                                                                      (reset! i (nth shuffled @k))
+                                                                      (reset! j 2))}]
+        [:input {:type "button" :value "Random Next" :on-click #(do
+                                                                  (reset! proceed-text "")
+                                                                  (swap! k bounded-inc)
+                                                                  (reset! i (nth shuffled @k))
+                                                                  (reset! j 2))}]]
      [:div
       [:form
        {:on-submit (fn [] (proceed) false)}
-      [:input {:type "text" :value @proceed-text :on-change #(if @auto-proceed?
-                                                               (proceed %)
-                                                               (let [
-                                                                     value (-> % .-target .-value)
-                                                                     ]
-                                                                 (reset! proceed-text value))
-                                                               )
-               :on-focus #(reset! proceed-text "")}]
-      (if-not @auto-proceed?
-        [:input {:type "button" :value "Go" :on-click #(proceed)}])[:br]
-      [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
-      [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
-      [:input {:type "checkbox" :checked @random-mode? :on-change #(let [
-                                                                         checked? (-> % .-target .-checked)
-                                                                         ]
-                                                                     (reset! random-mode? checked?)
-                                                                     (if-not checked?
-                                                                       (swap! i shuffler)))
-                                                                      } "Random Mode"][:br]
-      ]]
+       [:input {:type "text" :value @proceed-text :on-change #(if @auto-proceed?
+                                                                (proceed %)
+                                                                (let [
+                                                                      value (-> % .-target .-value)
+                                                                      ]
+                                                                  (reset! proceed-text value))
+                                                                )
+                :on-focus #(reset! proceed-text "")}]
+       (if-not @auto-proceed?
+         [:input {:type "button" :value "Go" :on-click #(proceed)}])[:br]
+       [:input {:type "checkbox" :checked @show-char? :on-change #(reset! show-char? (-> % .-target .-checked))} "Show Char"][:br]
+       [:input {:type "checkbox" :checked @auto-proceed? :on-change #(reset! auto-proceed? (-> % .-target .-checked))} "Auto Proceed"][:br]
+       [:input {:type "checkbox" :checked @random-mode? :on-change #(let [
+                                                                          checked? (-> % .-target .-checked)
+                                                                          ]
+                                                                      (reset! random-mode? checked?)
+                                                                      (if-not checked?
+                                                                        (swap! i smart-shuffler)))
+                } "Random Mode"][:br]
+       ]]
      [:div
       [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
       [:input {:type "button" :value "Go" :on-click #(do
@@ -114,14 +124,16 @@
       ]
      [:br]
      [:br]
-     [:input {:type "button"
-              :value "I know it"
-              :on-click t
-              }][:br][:br][:br]
-     [:input {:type "button"
-              :value "I know it too"
-              :on-click s-func
-              }]
+     (if @random-mode?
+       [:div
+        [:input {:type "button"
+                 :value "I know it"
+                 :on-click ban-i
+                 }][:br][:br][:br]
+        [:input {:type "button"
+                 :value "Reset known"
+                 :on-click #(reset! completed #{})
+                 }]])
      ]))
 
 (reagent/render-component
