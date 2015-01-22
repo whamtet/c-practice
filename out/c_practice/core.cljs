@@ -117,6 +117,10 @@
      [:input {:type "button"
               :value "I know it"
               :on-click t
+              }][:br][:br][:br]
+     [:input {:type "button"
+              :value "I know it too"
+              :on-click s
               }]
      ]))
 
