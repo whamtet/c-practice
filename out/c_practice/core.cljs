@@ -9,7 +9,7 @@
 (def completed (local-storage (atom #{}) :completed))
 
 (defn s [] (reset! completed 3))
-(defn t [] @completed)
+(defn t [] (js/alert (pr-str @completed)))
 
 (def p #(-> % pr-str println))
 
