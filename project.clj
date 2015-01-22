@@ -4,6 +4,7 @@
 
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2311"]
+                 [alandipert/storage-atom "1.2.3"]
                  [reagent "0.4.2"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]

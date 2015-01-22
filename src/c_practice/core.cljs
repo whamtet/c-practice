@@ -1,8 +1,15 @@
 (ns c-practice.core
   (:require
-   [reagent.core :as reagent :refer [atom]]))
+   [reagent.core :as reagent :refer [atom]]
+   [alandipert.storage-atom :refer [local-storage]]
+    ))
 
 (enable-console-print!)
+
+(def completed (local-storage (atom #{}) :completed))
+
+(defn s [] (reset! completed 3))
+(defn t [] @completed)
 
 (def p #(-> % pr-str println))
 
