@@ -25,33 +25,44 @@
 (def auto-proceed? (atom false))
 (def random-mode? (atom false))
 
-(def naive-shuffler (let [
+(def shuffle-forward (let [
                           x (shuffle (range 802))
                           ]
                       (zipmap x (drop 1 (cycle x)))))
 
-(defn smart-shuffler [i]
+(def shuffle-backward (zipmap (vals shuffle-forward) (keys shuffle-forward)))
+
+(defn smart-shuffler [f i]
   (if (= 802 (count @completed))
     0
-    (loop [j (naive-shuffler i)]
+    (loop [j (f i)]
       (if (@completed j)
-        (recur (naive-shuffler j))
+        (recur (f j))
         j))))
+
+(def smart-shuffle-forward #(smart-shuffler shuffle-forward %))
+(def smart-shuffle-backward #(smart-shuffler shuffle-backward %))
 
 (defn ban-i []
   (swap! completed conj @i)
-  (swap! i smart-shuffler))
+  (swap! i smart-shuffle-forward))
 
 (defn bounded-dec [x]
-  (if (zero? x) x (dec x)))
+  (cond
+   @random-mode? (smart-shuffle-backward x)
+   (zero? x) x
+   :default (dec x)))
+
 (defn bounded-inc [x]
-  (if (= 801 x) x (inc x)))
+  (cond
+   @random-mode? (smart-shuffle-forward x)
+   (= 801 x) x
+   :default (inc x)))
 
 (def proceed
   #(let [
          value (if % (-> % .-target .-value) @proceed-text)
-         id (if @random-mode?
-              (smart-shuffler @i) @i)
+         id @i
          ]
      (if (= value (first (nth data id)))
        (do
@@ -62,8 +73,7 @@
 
 (defn render []
   (let [
-        id (if @random-mode?
-             (smart-shuffler @i) @i)
+        id @i
         s (if @show-char?
             (take @j (nth data id))
             (drop 1 (take @j (nth data id))))
@@ -82,17 +92,6 @@
                                                          (swap! i bounded-inc)
                                                          (reset! j 2))}]
       [:input {:type "button" :value "Hint" :on-click #(swap! j inc)}]]
-     #_[:div
-        [:input {:type "button" :value "Random Previous" :on-click #(do
-                                                                      (reset! proceed-text "")
-                                                                      (swap! k bounded-dec)
-                                                                      (reset! i (nth shuffled @k))
-                                                                      (reset! j 2))}]
-        [:input {:type "button" :value "Random Next" :on-click #(do
-                                                                  (reset! proceed-text "")
-                                                                  (swap! k bounded-inc)
-                                                                  (reset! i (nth shuffled @k))
-                                                                  (reset! j 2))}]]
      [:div
       [:form
        {:on-submit (fn [] (proceed) false)}
@@ -112,8 +111,8 @@
                                                                           checked? (-> % .-target .-checked)
                                                                           ]
                                                                       (reset! random-mode? checked?)
-                                                                      (if-not checked?
-                                                                        (swap! i smart-shuffler)))
+                                                                      #_(if-not checked?
+                                                                        (swap! i smart-shuffle-forward)))
                 } "Random Mode"][:br]
        ]]
      [:div
