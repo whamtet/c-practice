@@ -111,7 +111,14 @@
       [:input {:type "button" :value "Go" :on-click #(do
                                                        (reset! i (int @text))
                                                        (reset! j 2))}]
-      ]]))
+      ]
+     [:br]
+     [:br]
+     [:input {:type "button"
+              :value "I know it"
+              :on-click t
+              }]
+     ]))
 
 (reagent/render-component
  [render]
