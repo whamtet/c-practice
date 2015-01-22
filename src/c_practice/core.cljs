@@ -8,7 +8,7 @@
 
 (def completed (local-storage (atom #{}) :completed))
 
-(defn s [] (reset! completed 3))
+(defn s-func [] (reset! completed 3))
 (defn t [] (js/alert (pr-str @completed)))
 
 (def p #(-> % pr-str println))
@@ -120,7 +120,7 @@
               }][:br][:br][:br]
      [:input {:type "button"
               :value "I know it too"
-              :on-click s
+              :on-click s-func
               }]
      ]))
 
