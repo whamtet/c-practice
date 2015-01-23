@@ -2,7 +2,9 @@
   (:require
    [reagent.core :as reagent :refer [atom]]
    [alandipert.storage-atom :refer [local-storage]]
-   ))
+   )
+  (:require-macros
+   [c-practice.macros :as m]))
 
 (enable-console-print!)
 
@@ -24,6 +26,7 @@
 (def show-char? (atom true))
 (def auto-proceed? (atom false))
 (def random-mode? (atom false))
+(def show-completed? (atom false))
 
 (def shuffle-forward (let [
                           x (shuffle (range 802))
@@ -71,6 +74,12 @@
          (reset! j 2))
        (reset! proceed-text value))))
 
+(defn completed-char [i]
+  [:input {:type "button"
+           :value (nth (nth data i) 0)
+           :on-click #(swap! completed disj i)
+           }])
+
 (defn render []
   (let [
         id @i
@@ -114,6 +123,8 @@
                                                                       #_(if-not checked?
                                                                         (swap! i smart-shuffle-forward)))
                 } "Random Mode"][:br]
+       [:input {:type "checkbox" :checked @show-completed? :on-change #(reset! show-completed? (-> % .-target .-checked))
+                } "Show Completed"][:br]
        ]]
      [:div
       [:input {:type "number" :value @text :min 0 :max 800 :on-change #(reset! text (-> % .-target .-value))}]
@@ -133,6 +144,8 @@
                  :value "Reset known"
                  :on-click #(reset! completed #{})
                  }]])
+     (if @show-completed?
+       [:div (m/meta-map "completed" completed-char @completed)])
      ]))
 
 (reagent/render-component
